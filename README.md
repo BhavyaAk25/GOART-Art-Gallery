@@ -1,12 +1,13 @@
-# GOART — Modern Art Gallery (Matisse + Picasso + Hokusai)
+# GOART — Mobile Art Gallery (Matisse + Picasso + Hokusai)
 
-A lightweight React + TypeScript + Vite experience for exploring 20th‑century paintings in a reels/card flow. Designed to keep the art first: warm neutral palette, luxe display type for the masthead, minimal chrome. Includes both desktop (scroll-snap) and mobile (card slider) entry points.
+A lightweight React + TypeScript + Vite mobile art gallery for exploring masterworks by Matisse, Picasso, and Hokusai. Museum-wall style viewer with 3D wooden frames, interactive tilt controls, and curated descriptions. Designed to keep the art first: warm neutral palette, luxe display type, minimal chrome.
 
 ## What this is
-- **Desktop web**: full-height vertical scroll, swipe/scroll to move; tap/click toggles an overlay; `Esc` closes overlays.
-- **Mobile** (`mobile.html`): museum-wall style viewer (painting defines the frame). Side arrows navigate. Tap toggles an "inspect" plaque with title/artist/year/medium/description; drag tilts the 3D frame.
-- **Content**: 30 paintings (10 Matisse, 10 Picasso, 10 Hokusai) pulled from the Art Institute of Chicago IIIF service, with two-sentence descriptions, year, medium, artist.
-- **Image fit (desktop)**: paintings use `object-contain` on a light backdrop so no artwork is cropped.
+- **Museum-wall viewer**: painting defines the frame, scaling to fit the viewport while preserving aspect ratio (portrait/landscape).
+- **3D wooden frames**: WebGL-powered frames with drag-to-tilt interaction and wooden plank texture on the back.
+- **Navigation**: Side arrows to browse paintings; tap to reveal an "inspect" plaque with title/artist/year/medium/description.
+- **Content**: 30 paintings (10 Matisse, 10 Picasso, 10 Hokusai) pulled from the Art Institute of Chicago IIIF service, with two-sentence descriptions.
+- **Responsive**: Works on both mobile devices and desktop browsers.
 
 ## Stack & rationale
 - **React + TypeScript + Vite**: fast dev server + typed components.
@@ -20,27 +21,28 @@ A lightweight React + TypeScript + Vite experience for exploring 20th‑century 
 - Install: `npm install`
 
 ## Run
-- **Desktop (default)**: `npm run dev` → open the shown localhost (usually `http://localhost:5173/`).
-- **Mobile slider**: `npm run dev:mobile` → opens `mobile.html` on port `4174` (or whatever Vite prints).
-- Build: `npm run build`
-- Lint: `npm run lint`
+- **Development**: `npm run dev` → open the shown localhost (usually `http://localhost:5173/`).
+- **Build**: `npm run build`
+- **Lint**: `npm run lint`
 
 ## Key files
-- `src/App.tsx` — desktop scroll-snap feed, overlay behavior.
-- `src/MobileApp.tsx` + `src/mobile.tsx` + `mobile.html` — mobile slider entry.
-- `src/components/Frame3D.tsx` — Three.js 3D frame (builds box geometry to match each painting’s aspect and fits camera to avoid clipping).
-- `src/components/PaintLoader.tsx` — brush-only loading indicator (used when a slide is “slow” or WebGL context is lost).
+- `src/MobileApp.tsx` — main app component with gallery logic, navigation, and inspect mode.
+- `src/mobile.tsx` + `mobile.html` — app entry point.
+- `src/components/Frame3D.tsx` — Three.js 3D frame (builds box geometry to match each painting's aspect and fits camera to avoid clipping).
+- `src/components/PaintLoader.tsx` — brush-only loading indicator (used when a slide is "slow" or WebGL context is lost).
 - `src/data/paintings.ts` — the dataset of 30 paintings (10 Matisse, 10 Picasso, 10 Hokusai) with title/artist/year/medium/description/imageUrl. Edit or extend here to change content.
 - `src/index.css` — global theme, fonts, and animations (`slide-next/slide-prev`).
 - `tailwind.config.js` — theme tokens (sand/ink palette, fonts).
 
 ## Interactions & behavior
-- **Desktop**: vertical snap (`snap-y snap-mandatory`), `object-contain` images on a light backdrop; tap/click toggles overlay; `Esc` closes overlays. Overlay reveals with an ink-like wipe; idle paintings run a gentle Ken Burns drift.
-- **Mobile**: side arrows navigate; the painting scales to fit the viewport while preserving aspect ratio (portrait/landscape). Drag/tilt rotates the frame; a tap (not a drag) toggles an “inspect” plaque beside/below the artwork depending on screen width, and freezes the frame into a gentle pose while reading.
-- **State**: desktop overlay is per-card map; mobile keeps only navigation/tilt state.
+- **Navigation**: Side arrows navigate between paintings with smooth slide transitions and scale animations.
+- **3D Interaction**: Drag/swipe to tilt and rotate the wooden frame; the painting stays centered while the frame moves around it.
+- **Inspect Mode**: Tap (not drag) to reveal a museum-style plaque with title, artist, year, medium, and description. The plaque appears beside (desktop) or below (mobile) the painting.
+- **Aspect Preservation**: Each painting scales to fit the viewport while maintaining its original aspect ratio (portrait/landscape).
+- **State Management**: Keeps navigation state and tilt rotation; requested vs displayed indices prevent blank frames during loading.
 - **Loading**: images are remote IIIF JPEGs. If the IIIF service is offline, images can fail to load; replace URLs in `src/data/paintings.ts` if needed.
-- **Mobile transitions (no flash)**: mobile keeps the last “displayed” painting on screen until the next painting is actually ready, then crossfades in WebGL (or swaps in the fallback image path).
-- **Mobile loader**: a brush-only loader appears only if the next painting takes longer than a short threshold to become ready (and appears immediately during WebGL context loss).
+- **Smooth transitions**: Keeps the last displayed painting on screen until the next painting is ready, then crossfades in WebGL (or swaps in the fallback image path).
+- **Loading indicator**: A brush-only loader appears only if the next painting takes longer than a short threshold to become ready (and appears immediately during WebGL context loss).
 
 ## Content choices (why AIC IIIF)
 - Initial Wikimedia/WikiArt links returned 403/404 in-browser due to hotlink protection.
@@ -49,14 +51,13 @@ A lightweight React + TypeScript + Vite experience for exploring 20th‑century 
 
 ## Design notes
 - **Palette**: warm beige background with subtle radial accents; dark ink text; minimal chroma so the paintings lead.
-- **Type**: Cormorant Garamond for the GOART masthead; Space Grotesk body; Manrope for mobile legibility.
-- **Cards**: soft shadows (`shadow-card`), gentle ring, rounded corners; gradients to keep text legible over art.
-- **Motion**: desktop overlay reveals with ink-wipe; idle paintings drift (Ken Burns). Mobile card transitions use eased translate/scale + tilt; 3D frame interaction via WebGL (with CSS fallback).
+- **Type**: Cormorant Garamond for the GOART masthead; Manrope for UI clarity and legibility.
+- **3D Frames**: soft shadows (`shadow-card`), wooden texture on back, rounded corners; paintings sit on transparent planes in front of the frame.
+- **Motion**: Card transitions use eased translate/scale + tilt; 3D frame interaction via WebGL (with CSS fallback for non-WebGL browsers).
 
 ## Known constraints / gotchas
 - Requires network to load IIIF images.
 - If you add new works from AIC, grab `image_id` from their API and use the same IIIF URL pattern. If you use another museum, ensure hotlinking is allowed.
-- Desktop scroll-snap behavior is native; on some touchpads it may feel “sticky” by design.
 - WebGL texture load timing: the 3D frame loads textures asynchronously; the UI keeps showing the previous painting until the new texture is ready, and then fades to it.
 - WebGL context loss (Chrome DevTools device emulation / heavy GPU load): some environments can intermittently lose the WebGL context (the renderer goes blank). The app detects this, shows a loader + last-known image, and rebuilds the renderer after restore.
 
@@ -66,14 +67,14 @@ A lightweight React + TypeScript + Vite experience for exploring 20th‑century 
 - Tweak mobile animation timing in `src/index.css` (`slide-next`/`slide-prev`).
 - Add more metadata chips in the overlay if desired (movement, museum, tags).
 
-## Engineering notes (mobile)
+## Engineering notes
 
 ### Rendering modes
 - **WebGL mode** (preferred): `Frame3D` renders the frame and painting as textures on a plane.
 - **Non‑WebGL fallback**: uses a `background-image` centered/contained, so the browser never flashes its broken-image placeholder mid-transition.
 
 ### State model: requested vs displayed
-Mobile uses two indices:
+The app uses two indices:
 - **Requested**: the user’s target slide (changes immediately on next/prev).
 - **Displayed**: the slide currently guaranteed to be renderable (only changes after the new painting is ready).
 
@@ -131,6 +132,6 @@ When this happens:
 3) Test without device emulation to see if the issue is emulation-only.
 
 ## Quick start (TL;DR)
-1) `npm install`  
-2) `npm run dev` (desktop) or `npm run dev:mobile` (mobile)  
+1) `npm install`
+2) `npm run dev`
 3) Edit `src/data/paintings.ts` to swap or add works.  
