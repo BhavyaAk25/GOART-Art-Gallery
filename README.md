@@ -1,11 +1,11 @@
-# GOART — Modern Art Reels (Matisse + Picasso)
+# GOART — Modern Art Gallery (Matisse + Picasso + Hokusai)
 
 A lightweight React + TypeScript + Vite experience for exploring 20th‑century paintings in a reels/card flow. Designed to keep the art first: warm neutral palette, luxe display type for the masthead, minimal chrome. Includes both desktop (scroll-snap) and mobile (card slider) entry points.
 
 ## What this is
 - **Desktop web**: full-height vertical scroll, swipe/scroll to move; tap/click toggles an overlay; `Esc` closes overlays.
-- **Mobile** (`mobile.html`): museum-wall style viewer (painting defines the frame). Side arrows navigate. Tap toggles an “inspect” plaque with title/artist/year/medium/description; drag tilts the 3D frame.
-- **Content**: 20 paintings (10 Matisse, 10 Picasso) pulled from the Art Institute of Chicago IIIF service, with two-sentence descriptions, year, medium, artist.
+- **Mobile** (`mobile.html`): museum-wall style viewer (painting defines the frame). Side arrows navigate. Tap toggles an "inspect" plaque with title/artist/year/medium/description; drag tilts the 3D frame.
+- **Content**: 30 paintings (10 Matisse, 10 Picasso, 10 Hokusai) pulled from the Art Institute of Chicago IIIF service, with two-sentence descriptions, year, medium, artist.
 - **Image fit (desktop)**: paintings use `object-contain` on a light backdrop so no artwork is cropped.
 
 ## Stack & rationale
@@ -30,7 +30,7 @@ A lightweight React + TypeScript + Vite experience for exploring 20th‑century 
 - `src/MobileApp.tsx` + `src/mobile.tsx` + `mobile.html` — mobile slider entry.
 - `src/components/Frame3D.tsx` — Three.js 3D frame (builds box geometry to match each painting’s aspect and fits camera to avoid clipping).
 - `src/components/PaintLoader.tsx` — brush-only loading indicator (used when a slide is “slow” or WebGL context is lost).
-- `src/data/paintings.ts` — the dataset (title/artist/year/medium/description/imageUrl). Edit or extend here to change content.
+- `src/data/paintings.ts` — the dataset of 30 paintings (10 Matisse, 10 Picasso, 10 Hokusai) with title/artist/year/medium/description/imageUrl. Edit or extend here to change content.
 - `src/index.css` — global theme, fonts, and animations (`slide-next/slide-prev`).
 - `tailwind.config.js` — theme tokens (sand/ink palette, fonts).
 
@@ -61,7 +61,7 @@ A lightweight React + TypeScript + Vite experience for exploring 20th‑century 
 - WebGL context loss (Chrome DevTools device emulation / heavy GPU load): some environments can intermittently lose the WebGL context (the renderer goes blank). The app detects this, shows a loader + last-known image, and rebuilds the renderer after restore.
 
 ## How to extend
-- Add or reorder works in `src/data/paintings.ts`; the feeds shuffle on load.
+- Add or reorder works in `src/data/paintings.ts` (currently 30 paintings from Matisse, Picasso, and Hokusai); the feeds shuffle on load.
 - Adjust palette or typography in `tailwind.config.js` and `src/index.css`.
 - Tweak mobile animation timing in `src/index.css` (`slide-next`/`slide-prev`).
 - Add more metadata chips in the overlay if desired (movement, museum, tags).
