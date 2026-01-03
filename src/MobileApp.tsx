@@ -3,6 +3,7 @@ import type { PointerEvent as ReactPointerEvent } from 'react'
 import { paintings } from './data/paintings'
 import Frame3D from './components/Frame3D'
 import PaintLoader from './components/PaintLoader'
+import ChatBot from './components/ChatBot'
 
 const shuffle = <T,>(list: T[]): T[] => {
   const copy = [...list]
@@ -361,6 +362,9 @@ function MobileApp() {
             </svg>
           </button>
         </div>
+
+        {/* AI Art Guide ChatBot - only shows in inspect mode */}
+        {displayed && inspecting && <ChatBot painting={displayed} />}
       </main>
     </div>
   )

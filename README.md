@@ -1,13 +1,31 @@
 # GOART —  Art Gallery (Matisse + Picasso + Hokusai)
 
-A lightweight React + TypeScript + Vite mobile art gallery for exploring masterworks by Matisse, Picasso, and Hokusai. Museum-wall style viewer with 3D wooden frames, interactive tilt controls, and curated descriptions. Designed to keep the art first: warm neutral palette, luxe display type, minimal chrome.
+A lightweight React + TypeScript + Vite mobile art gallery for exploring masterworks by Matisse, Picasso, and Hokusai. Museum-wall style viewer with 3D wooden frames, interactive tilt controls, curated descriptions, and **AI-powered chat** to learn more about each painting. Designed to keep the art first: warm neutral palette, luxe display type, minimal chrome.
+
+## Live Demo
+🔗 **https://goart-art-gallery.vercel.app/**
 
 ## What this is
 - **Museum-wall viewer**: painting defines the frame, scaling to fit the viewport while preserving aspect ratio (portrait/landscape).
 - **3D wooden frames**: WebGL-powered frames with drag-to-tilt interaction and wooden plank texture on the back.
 - **Navigation**: Side arrows to browse paintings; tap to reveal an "inspect" plaque with title/artist/year/medium/description.
+- **AI Art Guide**: Chat with an AI to ask questions about each painting—learn about technique, history, artist background, symbolism, and more.
 - **Content**: 30 paintings (10 Matisse, 10 Picasso, 10 Hokusai) pulled from the Art Institute of Chicago IIIF service, with two-sentence descriptions.
 - **Responsive**: Works on both mobile devices and desktop browsers.
+
+## AI Chat Feature
+
+The AI Art Guide allows users to have conversations about each painting. When viewing a painting, users can:
+- Ask about the artist's technique and style
+- Learn about the historical context
+- Understand symbolism and meaning
+- Compare with other works
+- Get educational insights
+
+**Tech Stack for AI:**
+- **Groq API** - Fast AI inference with Llama 3.1 model
+- Context-aware prompts include painting metadata (title, artist, year, medium, description)
+- Streaming responses for real-time chat experience
 
 ## Stack & rationale
 - **React + TypeScript + Vite**: fast dev server + typed components.
@@ -134,4 +152,103 @@ When this happens:
 ## Quick start (TL;DR)
 1) `npm install`
 2) `npm run dev`
-3) Edit `src/data/paintings.ts` to swap or add works.  
+3) Edit `src/data/paintings.ts` to swap or add works.
+
+## Implementation Notes: AI Chat Feature
+
+### Files to create:
+1. `src/components/ChatBot.tsx` - Chat UI component with:
+   - Floating chat button (bottom-right corner)
+   - Expandable chat dialog
+   - Message input field
+   - Message history display
+   - Loading states
+
+2. `src/services/groq.ts` - Groq API integration:
+   - Function to call Groq API with painting context
+   - System prompt that includes painting metadata
+   - Error handling
+
+### Integration points:
+- Add ChatBot component to `MobileApp.tsx`
+- Pass current painting data to ChatBot
+- ChatBot receives: title, artist, year, medium, description
+
+### Environment variables (for Vercel):
+- `VITE_GROQ_API_KEY` - Groq API key (set in Vercel dashboard)
+
+### API endpoint pattern:
+```javascript
+// Groq API call
+fetch('https://api.groq.com/openai/v1/chat/completions', {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${GROQ_API_KEY}`,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    model: 'llama-3.1-8b-instant',
+    messages: [
+      { role: 'system', content: `You are an art expert...` },
+      { role: 'user', content: userQuestion }
+    ]
+  })
+})
+```
+
+### Hackathon Submission:
+- **Event**: InnovArt 2026 (https://innovart2026.devpost.com/)
+- **Deadline**: January 3, 2026 at 12:00 PM EST (8:00 PM Kuwait)
+- **Requirements**: Submit to Devpost + Register presentation + Present Jan 4
+
+## Problems Faced & Solutions
+
+### Problem 1: Image 403/404 Errors
+**Issue**: Initial image sources (Wikimedia/WikiArt) returned 403/404 due to hotlink protection.
+**Solution**: Switched to Art Institute of Chicago's IIIF API which allows public hotlinking.
+**URL Pattern**: `https://www.artic.edu/iiif/2/{image_id}/full/1200,/0/default.jpg`
+
+### Problem 2: Images Not Loading (Loader Spinning)
+**Issue**: Paintings show loader indefinitely, broken image icon appears.
+**Possible Causes**:
+- Art Institute API temporarily slow/down
+- Network connectivity issues
+- Browser cache with stale data
+**Solutions**:
+- Hard refresh (Cmd+Shift+R / Ctrl+Shift+R)
+- Clear browser cache
+- Check DevTools Network tab for failed requests
+- Try different browser
+- Wait and retry (API may be temporarily slow)
+
+### Problem 3: Tailwind CSS v4 Issues
+**Issue**: Tailwind v4 CLI tooling was unreliable during setup.
+**Solution**: Pinned to Tailwind CSS v3.4 for stability.
+
+### Problem 4: WebGL Context Loss
+**Issue**: Chrome DevTools device emulation or GPU pressure causes WebGL context loss.
+**Solution**: App detects context loss, shows fallback image + loader, rebuilds renderer on restore.
+
+### Problem 5: Mobile Blank Frames During Navigation
+**Issue**: White flash/blank frames when switching paintings quickly.
+**Solution**: Implemented "requested vs displayed" state model - keeps showing current painting until next one is fully loaded.
+
+### Problem 6: GitHub Push Authentication
+**Issue**: GitHub no longer accepts passwords for git operations.
+**Solution**: Use Personal Access Token (PAT) instead of password:
+1. Create token at https://github.com/settings/tokens
+2. Use token as password when git asks for credentials
+3. Revoke token after use for security
+
+### Problem 7: Environment Variables for API Keys
+**Issue**: Need to store API keys securely without committing to git.
+**Solution**:
+- Local: Use `.env.local` file (already in .gitignore via `*.local`)
+- Vercel: Add environment variables in Vercel dashboard
+- Variable format: `VITE_GROQ_API_KEY=your_key_here`
+
+### Problem 8: Hidden Files Not Visible
+**Issue**: `.env.local` file not visible in Finder (macOS).
+**Solution**:
+- Press Cmd+Shift+. in Finder to show hidden files
+- Or use terminal: `nano /path/to/.env.local`  
