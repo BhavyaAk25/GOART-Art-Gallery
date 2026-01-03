@@ -1,4 +1,4 @@
-# GOART — Mobile Art Gallery (Matisse + Picasso + Hokusai)
+# GOART —  Art Gallery (Matisse + Picasso + Hokusai)
 
 A lightweight React + TypeScript + Vite mobile art gallery for exploring masterworks by Matisse, Picasso, and Hokusai. Museum-wall style viewer with 3D wooden frames, interactive tilt controls, and curated descriptions. Designed to keep the art first: warm neutral palette, luxe display type, minimal chrome.
 
