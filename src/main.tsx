@@ -1,10 +1,10 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import MobileApp from './MobileApp'
+import App from './App'
 
-createRoot(document.getElementById('mobile-root')!).render(
+createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <MobileApp />
+    <App />
   </StrictMode>,
 )

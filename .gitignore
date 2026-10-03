@@ -25,3 +25,9 @@ dist-ssr
 
 # Temp/debug files
 about-gpu-*.txt
+
+# Env / deploy
+.env
+.env.*
+!.env.example
+.vercel

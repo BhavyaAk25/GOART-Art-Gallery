@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { canUseWebGL, prefersReducedMotion } from '../lib/webgl'
 
 type Direction = 'next' | 'prev' | null
+export type RenderStatus = 'loading' | 'ready' | 'context_lost' | 'unsupported'
 
 type Props = {
   imageUrl: string
@@ -9,23 +11,12 @@ type Props = {
   frozen?: boolean
   restRotation?: { x: number; y: number }
   onTextureReady?: (imageUrl: string) => void
-  onRenderStatus?: (status: 'loading' | 'ready' | 'context_lost') => void
+  /** Called when an image could not be loaded (after one retry). */
+  onTextureError?: (imageUrl: string) => void
+  onRenderStatus?: (status: RenderStatus) => void
 }
 
 const BASE_HEIGHT = 1
-
-const webglSupported = () => {
-  if (typeof window === 'undefined') return false
-  try {
-    const canvas = document.createElement('canvas')
-    return !!(
-      window.WebGLRenderingContext &&
-      (canvas.getContext('webgl') || canvas.getContext('experimental-webgl'))
-    )
-  } catch {
-    return false
-  }
-}
 
 // Resize and set viewport
 const resizeRenderer = (
@@ -66,6 +57,7 @@ function Frame3D({
   frozen,
   restRotation,
   onTextureReady,
+  onTextureError,
   onRenderStatus,
 }: Props) {
   const [resetToken, setResetToken] = useState(0)
@@ -85,6 +77,7 @@ function Frame3D({
   const pendingUrlRef = useRef<string | null>(null)
   const currentTextureUrlRef = useRef<string | null>(null)
   const onTextureReadyRef = useRef<Props['onTextureReady']>(undefined)
+  const onTextureErrorRef = useRef<Props['onTextureError']>(undefined)
   const onRenderStatusRef = useRef<Props['onRenderStatus']>(undefined)
   const loaderRef = useRef<THREE.TextureLoader | null>(null)
   const loadSeqRef = useRef(0)
@@ -104,6 +97,7 @@ function Frame3D({
 
   useEffect(() => {
     onTextureReadyRef.current = onTextureReady
+    onTextureErrorRef.current = onTextureError
   })
 
   useEffect(() => {
@@ -164,12 +158,15 @@ function Frame3D({
     const loader = loaderRef.current ?? new THREE.TextureLoader()
     loaderRef.current = loader
     loader.setCrossOrigin('anonymous')
-    let texture: THREE.Texture
-    try {
-      texture = await loader.loadAsync(url)
-    } catch {
-      return null
+    let texture: THREE.Texture | null = null
+    for (let attempt = 0; attempt < 2 && !texture; attempt += 1) {
+      try {
+        texture = await loader.loadAsync(url)
+      } catch {
+        if (attempt === 0) await new Promise((resolve) => window.setTimeout(resolve, 600))
+      }
     }
+    if (!texture) return null
     texture.colorSpace = THREE.SRGBColorSpace
     texture.generateMipmaps = false
     texture.minFilter = THREE.LinearFilter
@@ -269,8 +266,13 @@ function Frame3D({
 
     const loadSeq = (loadSeqRef.current += 1)
     const texture = await loadTexture(url)
-    if (!texture) return
     if (loadSeq !== loadSeqRef.current) {
+      texture?.dispose()
+      return
+    }
+    if (!texture) {
+      onTextureErrorRef.current?.(url)
+      onRenderStatusRef.current?.(currentTextureRef.current ? 'ready' : 'loading')
       return
     }
 
@@ -311,8 +313,7 @@ function Frame3D({
   }, [getMaterials, loadTexture, resizeGeometry, safeDispose])
 
   useEffect(() => {
-    if (!webglSupported()) return undefined
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined
+    if (!canUseWebGL() || prefersReducedMotion()) return undefined
 
     const container = containerRef.current
     if (!container) return undefined
@@ -322,12 +323,18 @@ function Frame3D({
     currentTextureRef.current = null
     nextTextureRef.current = null
 
-    const renderer = new THREE.WebGLRenderer({
-      antialias: false,
-      alpha: true,
-      powerPreference: 'low-power',
-    })
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.25))
+    let renderer: THREE.WebGLRenderer
+    try {
+      renderer = new THREE.WebGLRenderer({
+        antialias: true,
+        alpha: true,
+        powerPreference: 'low-power',
+      })
+    } catch {
+      onRenderStatusRef.current?.('unsupported')
+      return undefined
+    }
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     renderer.setClearColor(0x000000, 0)
     rendererRef.current = renderer
     container.appendChild(renderer.domElement)
@@ -527,7 +534,7 @@ function Frame3D({
 
   // Handle new images
   useEffect(() => {
-    if (!webglSupported()) return
+    if (!canUseWebGL()) return
     if (!imageUrl) return
     if (!sceneReadyRef.current) {
       pendingUrlRef.current = imageUrl
@@ -539,7 +546,7 @@ function Frame3D({
 
   // Handle direction for a small nudge
   useEffect(() => {
-    if (!webglSupported()) return
+    if (!canUseWebGL()) return
     if (!direction) {
       lastDir.current = null
       return
@@ -552,7 +559,7 @@ function Frame3D({
 
   // Pointer drag
   useEffect(() => {
-    if (!webglSupported()) return undefined
+    if (!canUseWebGL()) return undefined
     const container = containerRef.current
     if (!container) return undefined
 
@@ -593,7 +600,7 @@ function Frame3D({
     }
   }, [frozen])
 
-  if (!webglSupported()) return null
+  if (!canUseWebGL()) return null
 
   return (
     <div

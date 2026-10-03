@@ -4,9 +4,9 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['"Space Grotesk"', 'Inter', 'system-ui', 'sans-serif'],
+        sans: ['"Manrope"', 'system-ui', 'sans-serif'],
         display: ['"Cormorant Garamond"', 'serif'],
-        mobile: ['"Manrope"', 'Inter', 'system-ui', 'sans-serif'],
+        mobile: ['"Manrope"', 'system-ui', 'sans-serif'],
       },
       colors: {
         sand: {

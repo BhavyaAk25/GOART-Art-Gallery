@@ -2,11 +2,27 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Great Art · Mobile</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>GOART — Art Gallery</title>
+    <meta
+      name="description"
+      content="A museum-wall gallery of 30 works by Matisse, Picasso, and Hokusai in 3D wooden frames, with an AI art guide."
+    />
+    <meta name="theme-color" content="#f7f1e6" />
+    <meta property="og:title" content="GOART — Art Gallery" />
+    <meta property="og:description" content="Explore Matisse, Picasso, and Hokusai in 3D frames and ask an AI guide about each work." />
+    <meta property="og:image" content="/paintings/hokusai-great-wave.jpg" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Manrope:wght@400;500;600;700&display=swap"
+    />
   </head>
   <body>
-    <div id="mobile-root"></div>
-    <script type="module" src="/src/mobile.tsx"></script>
+    <noscript>GOART needs JavaScript to display the gallery.</noscript>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
