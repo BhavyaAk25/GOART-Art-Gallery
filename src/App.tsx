@@ -25,6 +25,9 @@ const shuffle = <T,>(list: T[]): T[] => {
 const preloadImage = (url: string) =>
   new Promise<void>((resolve, reject) => {
     const img = new Image()
+    // Match the WebGL texture request (CORS, no referrer) so the browser cache is reused.
+    img.crossOrigin = 'anonymous'
+    img.referrerPolicy = 'no-referrer'
     img.onload = () => resolve()
     img.onerror = () => reject(new Error(`Failed to load ${url}`))
     img.src = url
@@ -128,6 +131,8 @@ function App() {
     if (!displayed) return undefined
     let canceled = false
     const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.referrerPolicy = 'no-referrer'
     img.onload = () => {
       if (!canceled && img.naturalWidth > 0 && img.naturalHeight > 0) {
         setImageAspect(img.naturalWidth / img.naturalHeight)

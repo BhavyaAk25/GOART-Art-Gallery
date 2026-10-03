@@ -1,19 +1,11 @@
 import { defineConfig, loadEnv, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import { handleChat } from './server/chat.js'
-import { fetchIiifImage } from './server/iiif.js'
 
-// Dev-only mirrors of the Vercel functions in api/ (chat + IIIF image proxy).
+// Dev-only mirror of the Vercel function in api/chat.ts.
 const devApi = (apiKey: string | undefined, model: string | undefined): Plugin => ({
   name: 'goart-dev-api',
   configureServer(server) {
-    server.middlewares.use('/iiif', async (req, res) => {
-      const path = decodeURIComponent((req.url ?? '').replace(/^\//, '').split('?')[0])
-      const response = await fetchIiifImage(path)
-      res.statusCode = response.status
-      response.headers.forEach((value, key) => res.setHeader(key, value))
-      res.end(Buffer.from(await response.arrayBuffer()))
-    })
     server.middlewares.use('/api/chat', (req, res) => {
       if (req.method !== 'POST') {
         res.statusCode = 405

@@ -39,7 +39,7 @@ The gallery works without a key. Only the Art Guide needs `GROQ_API_KEY`; withou
 
 | Script | What it does |
 | --- | --- |
-| `npm run dev` | Dev server, including local versions of `/api/chat` and the `/iiif` image proxy |
+| `npm run dev` | Dev server, including a local version of `/api/chat` |
 | `npm run build` | Type-check and production build to `dist/` |
 | `npm run preview` | Serve the production build locally (static only, no API routes) |
 | `npm run lint` | ESLint |
@@ -48,7 +48,7 @@ The gallery works without a key. Only the Art Guide needs `GROQ_API_KEY`; withou
 
 1. Import the repo into Vercel (framework preset: **Vite**).
 2. Under **Settings → Environment Variables**, add `GROQ_API_KEY`. Optionally add `GROQ_MODEL`.
-3. Deploy. `vercel.json` routes `/iiif/*` to the image proxy function and sets long cache headers for bundled images.
+3. Deploy. `vercel.json` sets long cache headers for the bundled images.
 
 > ⚠️ Use `GROQ_API_KEY`, **not** `VITE_GROQ_API_KEY`. Anything prefixed with `VITE_` is embedded in the public JavaScript bundle.
 
@@ -57,10 +57,8 @@ The gallery works without a key. Only the Art Guide needs `GROQ_API_KEY`; withou
 ```
 api/
   chat.ts            Vercel function: POST /api/chat (Art Guide, rate limited)
-  iiif.ts            Vercel function: same-origin proxy for AIC images
 server/
   chat.ts            Shared chat logic: validation, prompt, Groq call
-  iiif.ts            Shared image-proxy logic (strict path allowlist)
 public/paintings/    Public-domain images, bundled locally
 src/
   App.tsx            Gallery: navigation, loading state, plaque, layout
@@ -77,16 +75,16 @@ src/
 All artwork images come from the [Art Institute of Chicago](https://www.artic.edu/) (AIC) collection.
 
 - **Public-domain works** (all Hokusai prints and three Matisse paintings) are bundled in `public/paintings/` and served as static files.
-- **Works still under copyright** (most Matisse and all Picasso) are **not** stored in this repository. They load at AIC's reduced, fair-use size through a same-origin proxy (`/iiif/*`).
+- **Works still under copyright** (most Matisse and all Picasso) are **not** stored in this repository. They load directly from AIC's IIIF service at its reduced, fair-use size (843px).
 
-Why a proxy? AIC blocks image requests that carry a third-party `Referer` (hotlink protection). The browser reports that 403 as a CORS error, so WebGL couldn't use the image and frames stayed blank. Fetching images server-side avoids this, and the proxy only accepts exact IIIF image paths, so it can't be abused as an open proxy.
+**Why `no-referrer`?** AIC blocks image requests that carry a third-party `Referer` (hotlink protection). The 403 it returns has no CORS headers, so the browser reports a CORS error, WebGL can't use the image, and the frame stays blank. `index.html` sets `<meta name="referrer" content="no-referrer">`, so the requests go through. Don't remove it. (A server-side proxy doesn't work either, because AIC also blocks Vercel's datacenter IPs.)
 
 ### Adding a painting
 
 1. Find the work with the [AIC API](https://api.artic.edu/docs/) and note its `image_id` and `is_public_domain`.
 2. Add an entry to `src/data/paintings.ts`:
    - public domain: download `https://www.artic.edu/iiif/2/{image_id}/full/1200,/0/default.jpg` to `public/paintings/{id}.jpg`, then use `imageUrl: '/paintings/{id}.jpg'`
-   - otherwise: `imageUrl: '/iiif/{image_id}/full/843,/0/default.jpg'`
+   - otherwise: `imageUrl: 'https://www.artic.edu/iiif/2/{image_id}/full/843,/0/default.jpg'`
 
 ## How it works
 

@@ -2,10 +2,12 @@
  * Gallery dataset. All images come from the Art Institute of Chicago (artic.edu).
  *
  * - Public-domain works are bundled in `public/paintings/` and served as static files.
- * - Works still under copyright are NOT stored in this repo. They are loaded from the
- *   AIC IIIF service through a same-origin proxy (`/iiif/*` → `https://www.artic.edu/iiif/2/*`,
- *   configured in `vite.config.ts` for dev and `vercel.json` in production). Serving them
- *   same-origin avoids the CORS failures that left WebGL frames blank.
+ * - Works still under copyright are NOT stored in this repo; they load from the AIC IIIF
+ *   service at its reduced, fair-use size (843px).
+ *
+ * AIC rejects image requests that carry a third-party `Referer` (hotlink protection) with a
+ * 403 that has no CORS headers, which browsers report as a CORS error and which left WebGL
+ * frames blank. `index.html` therefore sets `<meta name="referrer" content="no-referrer">`.
  */
 export type Painting = {
   id: string
@@ -26,7 +28,7 @@ export const paintings: Painting[] = [
     medium: 'Oil on canvas',
     description:
       'Figure fragments flatten into bands of green and gray, turning a riverbank into pure rhythm. The bodies feel carved into the surface, as if sculpture melted into paint.',
-    imageUrl: '/iiif/419ddce3-c90b-3d0c-43b3-73683a87bf98/full/843,/0/default.jpg',
+    imageUrl: 'https://www.artic.edu/iiif/2/419ddce3-c90b-3d0c-43b3-73683a87bf98/full/843,/0/default.jpg',
   },
   {
     id: 'matisse-aquarium',
@@ -46,7 +48,7 @@ export const paintings: Painting[] = [
     medium: 'Oil on canvas',
     description:
       'Sunlight, shutters, and patterned fabrics turn a simple room into a stage of color. Every textile and shadow becomes a gentle note in a domestic symphony.',
-    imageUrl: '/iiif/2193cdda-2691-2802-0776-145dee77f7ea/full/843,/0/default.jpg',
+    imageUrl: 'https://www.artic.edu/iiif/2/2193cdda-2691-2802-0776-145dee77f7ea/full/843,/0/default.jpg',
   },
   {
     id: 'matisse-apples',
@@ -66,7 +68,7 @@ export const paintings: Painting[] = [
     medium: 'Oil on canvas',
     description:
       'White blooms float above a patterned cloth, glowing against gentle blues and greens. It’s a late bouquet where simplicity and lightness do the storytelling.',
-    imageUrl: '/iiif/1693f1ff-40a4-e0e2-16cd-3d8d055dc266/full/843,/0/default.jpg',
+    imageUrl: 'https://www.artic.edu/iiif/2/1693f1ff-40a4-e0e2-16cd-3d8d055dc266/full/843,/0/default.jpg',
   },
   {
     id: 'picasso-guitarist',
@@ -76,7 +78,7 @@ export const paintings: Painting[] = [
     medium: 'Oil on panel',
     description:
       'A blue-toned figure cradles his guitar, the only warm note in a cold world. The body bends around the instrument, as if music is the last thread of warmth.',
-    imageUrl: '/iiif/4e7f3081-179a-af18-8abd-7908a7ae8c4e/full/843,/0/default.jpg',
+    imageUrl: 'https://www.artic.edu/iiif/2/4e7f3081-179a-af18-8abd-7908a7ae8c4e/full/843,/0/default.jpg',
   },
   {
     id: 'picasso-kahnweiler',
@@ -86,7 +88,7 @@ export const paintings: Painting[] = [
     medium: 'Oil on canvas',
     description:
       'Cubist facets of a dealer’s portrait crystallize into planes of ochre and gray. The subject dissolves into geometry, but the gaze still holds steady.',
-    imageUrl: '/iiif/aebda29e-16b8-4393-6edc-805cdb6ba459/full/843,/0/default.jpg',
+    imageUrl: 'https://www.artic.edu/iiif/2/aebda29e-16b8-4393-6edc-805cdb6ba459/full/843,/0/default.jpg',
   },
   {
     id: 'picasso-red-armchair',
@@ -96,7 +98,7 @@ export const paintings: Painting[] = [
     medium: 'Oil and Ripolin on panel',
     description:
       'A seated figure twists into biomorphic curves against a lush scarlet chair. The glossy Ripolin paint adds a lacquered sheen that makes the forms pulse.',
-    imageUrl: '/iiif/c617e2f0-d5fe-0772-390e-6d8c83895815/full/843,/0/default.jpg',
+    imageUrl: 'https://www.artic.edu/iiif/2/c617e2f0-d5fe-0772-390e-6d8c83895815/full/843,/0/default.jpg',
   },
   {
     id: 'picasso-mother-child',
@@ -106,7 +108,7 @@ export const paintings: Painting[] = [
     medium: 'Oil on canvas',
     description:
       'A monumental mother cradles her child, rendered in strong classical volumes. Tenderness lives inside solid forms, blending ancient calm with modern line.',
-    imageUrl: '/iiif/64734461-887d-80b9-8489-e38cb05ac01d/full/843,/0/default.jpg',
+    imageUrl: 'https://www.artic.edu/iiif/2/64734461-887d-80b9-8489-e38cb05ac01d/full/843,/0/default.jpg',
   },
   {
     id: 'picasso-man-pipe',
@@ -116,7 +118,7 @@ export const paintings: Painting[] = [
     medium: 'Oil on canvas',
     description:
       'Cubist shards arrange a sitter and his pipe into angular layers of browns and grays. The smoke seems to hang in the fractures, suspending time in facets.',
-    imageUrl: '/iiif/43bc66e2-95b2-fb3c-b9b1-232835bfd027/full/843,/0/default.jpg',
+    imageUrl: 'https://www.artic.edu/iiif/2/43bc66e2-95b2-fb3c-b9b1-232835bfd027/full/843,/0/default.jpg',
   },
   {
     id: 'matisse-geranium',
@@ -136,7 +138,7 @@ export const paintings: Painting[] = [
     medium: 'Oil on canvas',
     description:
       'Bright lemons glow against the cool sheen of pewter, a duet of color and metal. The painting feels like a pause, catching citrus light before it slips away.',
-    imageUrl: '/iiif/79f1c666-1e19-af39-f7e0-f22989835eb2/full/843,/0/default.jpg',
+    imageUrl: 'https://www.artic.edu/iiif/2/79f1c666-1e19-af39-f7e0-f22989835eb2/full/843,/0/default.jpg',
   },
   {
     id: 'matisse-laurette-coffee',
@@ -146,7 +148,7 @@ export const paintings: Painting[] = [
     medium: 'Oil on canvas',
     description:
       'Laurette leans toward a small cup, patterns rippling around her in deep greens and blacks. The quiet gesture becomes ceremonial, held in pools of saturated color.',
-    imageUrl: '/iiif/72d28816-c42f-af88-63fc-d12426db240e/full/843,/0/default.jpg',
+    imageUrl: 'https://www.artic.edu/iiif/2/72d28816-c42f-af88-63fc-d12426db240e/full/843,/0/default.jpg',
   },
   {
     id: 'matisse-girl-guitar',
@@ -156,7 +158,7 @@ export const paintings: Painting[] = [
     medium: 'Oil on canvas',
     description:
       'A guitarist in lemon and azure balances curves of the instrument with blocks of flat color. Music turns into color chords, strummed across the canvas.',
-    imageUrl: '/iiif/0fc277a0-003c-393f-556b-f8dbc8c81427/full/843,/0/default.jpg',
+    imageUrl: 'https://www.artic.edu/iiif/2/0fc277a0-003c-393f-556b-f8dbc8c81427/full/843,/0/default.jpg',
   },
   {
     id: 'matisse-girl-reading',
@@ -166,7 +168,7 @@ export const paintings: Painting[] = [
     medium: 'Lithograph on wove paper',
     description:
       'A young reader bends into the page, drawn with economical black lines on soft paper. The scene is hushed, letting the whiteness of the sheet become light itself.',
-    imageUrl: '/iiif/0b72eabf-58e7-d064-97b3-44508cd248bd/full/843,/0/default.jpg',
+    imageUrl: 'https://www.artic.edu/iiif/2/0b72eabf-58e7-d064-97b3-44508cd248bd/full/843,/0/default.jpg',
   },
   {
     id: 'picasso-nude-cats',
@@ -176,7 +178,7 @@ export const paintings: Painting[] = [
     medium: 'Oil on cardboard',
     description:
       'A blue-toned figure curls with two quick cats, tenderness edged by early-modern distortion. The cardboard support lets the paint sit raw, like a sketch caught mid-thought.',
-    imageUrl: '/iiif/96c25381-bdfb-81c4-de91-1186aa38ace4/full/843,/0/default.jpg',
+    imageUrl: 'https://www.artic.edu/iiif/2/96c25381-bdfb-81c4-de91-1186aa38ace4/full/843,/0/default.jpg',
   },
   {
     id: 'picasso-sylvette',
@@ -186,7 +188,7 @@ export const paintings: Painting[] = [
     medium: 'Oil on canvas',
     description:
       'Sylvette’s high ponytail and sharp profile become graphic shapes in gray-blue light. Picasso flattens and facets her features until she feels both poster and sculpture.',
-    imageUrl: '/iiif/872371ff-d773-f209-8062-7f88c95f2691/full/843,/0/default.jpg',
+    imageUrl: 'https://www.artic.edu/iiif/2/872371ff-d773-f209-8062-7f88c95f2691/full/843,/0/default.jpg',
   },
   {
     id: 'picasso-nude-pitcher',
@@ -196,7 +198,7 @@ export const paintings: Painting[] = [
     medium: 'Oil on canvas',
     description:
       'Solid, simplified volumes and warm rose tones hint at classical sculpture. The body and pitcher share the same weight, as if both were carved from sunlit clay.',
-    imageUrl: '/iiif/aa7ac006-5b63-12aa-3ab7-705cc612aa0a/full/843,/0/default.jpg',
+    imageUrl: 'https://www.artic.edu/iiif/2/aa7ac006-5b63-12aa-3ab7-705cc612aa0a/full/843,/0/default.jpg',
   },
   {
     id: 'picasso-head-woman',
@@ -206,7 +208,7 @@ export const paintings: Painting[] = [
     medium: 'Oil on canvas',
     description:
       'Planes and edges build a head like an angular stone bust, glowing in ochres and greens. It bridges portrait and architecture, freezing motion into facets.',
-    imageUrl: '/iiif/a18f060c-6693-6246-0fe9-abc512841002/full/843,/0/default.jpg',
+    imageUrl: 'https://www.artic.edu/iiif/2/a18f060c-6693-6246-0fe9-abc512841002/full/843,/0/default.jpg',
   },
   {
     id: 'picasso-nude-pine',
@@ -216,7 +218,7 @@ export const paintings: Painting[] = [
     medium: 'Oil on canvas',
     description:
       'A reclining figure drawn in quick, looping lines rests beneath airy pine branches. Late Picasso lets line stay playful, making the body feel both graphic and alive.',
-    imageUrl: '/iiif/b7b7ecd0-5a50-b89a-c72a-d435a1957c73/full/843,/0/default.jpg',
+    imageUrl: 'https://www.artic.edu/iiif/2/b7b7ecd0-5a50-b89a-c72a-d435a1957c73/full/843,/0/default.jpg',
   },
   {
     id: 'hokusai-great-wave',
