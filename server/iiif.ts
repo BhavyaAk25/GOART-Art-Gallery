@@ -22,10 +22,18 @@ export async function fetchIiifImage(path: string): Promise<Response> {
   const upstream = await fetch(url, {
     headers: { Accept: 'image/jpeg', 'User-Agent': 'GOART-Gallery/1.0 (+https://goart-art-gallery.vercel.app)' },
     signal: AbortSignal.timeout(15_000),
-  }).catch(() => null)
+  }).catch((error: unknown) => {
+    console.error('IIIF fetch failed', url, error)
+    return null
+  })
 
   if (!upstream || !upstream.ok) {
-    return new Response('Image unavailable', { status: 502, headers: { 'Cache-Control': 'no-store' } })
+    const detail = upstream ? String(upstream.status) : 'network-error'
+    if (upstream) console.error('IIIF upstream error', url, upstream.status)
+    return new Response('Image unavailable', {
+      status: 502,
+      headers: { 'Cache-Control': 'no-store', 'X-Upstream-Status': detail },
+    })
   }
 
   return new Response(upstream.body, {
